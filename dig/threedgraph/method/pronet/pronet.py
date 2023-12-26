@@ -19,7 +19,6 @@ import torch.nn.functional as F
 import numpy as np
 
 
-num_aa_type = 26
 num_side_chain_embs = 8
 num_bb_embs = 6
 
@@ -292,6 +291,7 @@ class ProNet(nn.Module):
             dropout=0,
             data_augment_eachlayer=False,
             euler_noise = False,
+            num_aa_type = 26,
     ):
         super(ProNet, self).__init__()
         self.cutoff = cutoff
@@ -313,6 +313,8 @@ class ProNet(nn.Module):
             self.embedding = torch.nn.Linear(num_aa_type + num_bb_embs + num_side_chain_embs, hidden_channels)
         else:
             print('No supported model!')
+
+        self.num_aa_type = num_aa_type
 
         self.interaction_blocks = torch.nn.ModuleList(
             [
@@ -375,10 +377,10 @@ class ProNet(nn.Module):
         if self.level == 'aminoacid':
             x = self.embedding(z)
         elif self.level == 'backbone':
-            x = torch.cat([torch.squeeze(F.one_hot(z, num_classes=num_aa_type).float()), bb_embs], dim = 1)
+            x = torch.cat([torch.squeeze(F.one_hot(z, num_classes=self.num_aa_type).float()), bb_embs], dim = 1)
             x = self.embedding(x)
         elif self.level == 'allatom':
-            x = torch.cat([torch.squeeze(F.one_hot(z, num_classes=num_aa_type).float()), bb_embs, side_chain_embs], dim = 1)
+            x = torch.cat([torch.squeeze(F.one_hot(z, num_classes=self.num_aa_type).float()), bb_embs, side_chain_embs], dim = 1)
             x = self.embedding(x)
         else:
             print('No supported model!')
