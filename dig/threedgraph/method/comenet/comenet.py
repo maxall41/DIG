@@ -116,7 +116,7 @@ class EmbeddingBlock(torch.nn.Module):
     def __init__(self, hidden_channels, act=swish):
         super(EmbeddingBlock, self).__init__()
         self.act = act
-        self.emb = Embedding(95, hidden_channels)
+        self.emb = Embedding(101, hidden_channels)
         self.reset_parameters()
 
     def reset_parameters(self):
